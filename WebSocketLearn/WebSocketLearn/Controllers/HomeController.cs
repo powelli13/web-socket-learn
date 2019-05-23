@@ -1,9 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Net.WebSockets;
 using System.Linq;
+using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Http;
 using WebSocketLearn.Models;
 
 namespace WebSocketLearn.Controllers
@@ -22,12 +26,51 @@ namespace WebSocketLearn.Controllers
             return View();
         }
 
-        public IActionResult Contact()
+        public IActionResult ReadDickens()
         {
-            ViewData["Message"] = "Your contact page.";
+            ViewData["Message"] = "Enjoy some classic English literature.";
 
             return View();
         }
+
+        [Route("dickensws")]
+        public async Task<IActionResult> DickensWs()
+        {
+
+            if (this.HttpContext.WebSockets.IsWebSocketRequest)
+            {
+                WebSocket webSocket = await this.HttpContext.WebSockets.AcceptWebSocketAsync();
+                //await Echo(this.HttpContext, webSocket);
+
+                string message = "Hi from the server!";
+
+                await webSocket.SendAsync(
+                    new ArraySegment<byte>(Encoding.ASCII.GetBytes(message)),
+                    WebSocketMessageType.Text,
+                    true,
+                    CancellationToken.None
+                );
+            }
+            else
+            {
+                this.HttpContext.Response.StatusCode = 400;
+            }
+
+            return Ok();
+        }
+
+        //private async Task Echo(HttpContext context, WebSocket webSocket)
+        //{
+        //    var buffer = new byte[1024 * 4];
+        //    WebSocketReceiveResult result = await webSocket.ReceiveAsync(new ArraySegment<byte>(buffer), CancellationToken.None);
+        //    while (!result.CloseStatus.HasValue)
+        //    {
+        //        await webSocket.SendAsync(new ArraySegment<byte>(buffer, 0, result.Count), result.MessageType, result.EndOfMessage, CancellationToken.None);
+
+        //        result = await webSocket.ReceiveAsync(new ArraySegment<byte>(buffer), CancellationToken.None);
+        //    }
+        //    await webSocket.CloseAsync(result.CloseStatus.Value, result.CloseStatusDescription, CancellationToken.None);
+        //}
 
         public IActionResult Privacy()
         {

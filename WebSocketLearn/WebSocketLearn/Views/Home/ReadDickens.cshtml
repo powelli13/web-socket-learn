@@ -1,0 +1,74 @@
+﻿@{
+    ViewData["Title"] = "Read Dickens";
+}
+<h2>@ViewData["Title"]</h2>
+<h3>@ViewData["Message"]</h3>
+
+<div>
+    <div>
+        <div>Controls</div>
+        <input id="connectionUrl" enabled="false"/>
+        <button id="connectButton" type="submit">Connect</button>
+        <button id="closeButton" type="submit">Close</button>
+        <button id="sendButton" type="submit">Send</button>
+    </div>
+    <div>What we have received:</div>
+    <div id="receivedLog">
+    </div>
+    <div>What we have sent:</div>
+    <div id="sentLog">
+    </div>
+
+    <script>
+        var receivedLog = document.getElementById("receivedLog");
+        var sentLog = document.getElementById("sentLog");
+        var connectButton = document.getElementById("connectButton");
+        var closeButton = document.getElementById("closeButton");
+        var connectionUrl = document.getElementById("connectionUrl");
+        var socket;
+
+        var scheme = document.location.protocol === "https:" ? "wss" : "ws";
+        var port = document.location.port ? (":" + document.location.port) : "";
+        connectionUrl.value = scheme + "://" + document.location.hostname + port + "/dickensws" ;
+
+        connectButton.onclick = function () {
+            socket = new WebSocket(connectionUrl.value);
+
+            socket.onopen = function (event) {
+                sentLog.innerHTML += '<br /><p>Opened connection.</p>';
+            };
+            socket.onclose = function (event) {
+                sentLog.innerHTML += '<br /><p>Closed connection.</p>';
+            };
+            socket.onmessage = function (event) {
+                receivedLog.innerHTML += '<br /><p>'+ htmlEscape(event.data) +'</p>';
+            };
+        };
+
+        sendButton.onclick = function () {
+
+            if (!socket || socket.readyState !== WebSocket.OPEN) {
+                alert("socket not connected");
+            }
+            var data = "More data from client.";
+            socket.send(data);
+        };
+
+        closeButton.onclick = function () {
+            if (!socket || socket.readyState !== WebSocket.OPEN) {
+                alert("webSocket not connected");
+            }
+            socket.close(1000, "Closing from client");
+        };
+
+        function htmlEscape(str) {
+            return str.toString()
+                .replace(/&/g, '&amp;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;');
+        }
+
+    </script>
+</div>
