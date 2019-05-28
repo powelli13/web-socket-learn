@@ -1,5 +1,5 @@
 ﻿@{
-    ViewData["Title"] = "Read Dickens";
+    ViewData["Title"] = "Knock, knock.";
 }
 <h2>@ViewData["Title"]</h2>
 <h3>@ViewData["Message"]</h3>
@@ -10,7 +10,9 @@
         <input id="connectionUrl" enabled="false" />
         <button id="connectButton" type="submit">Connect</button>
         <button id="closeButton" type="submit">Close</button>
-        <button id="sendButton" type="submit">Send</button>
+        <button id="jokeButton" type="submit">Get a Joke</button>
+        <button id="whoButton" type="submit">Who's there?</button>
+        <button id="punchlineButton" type="submit">... who?</button>
     </div>
 
     <div>What we have sent:</div>
@@ -29,7 +31,7 @@
 
         var scheme = document.location.protocol === "https:" ? "wss" : "ws";
         var port = document.location.port ? (":" + document.location.port) : "";
-        connectionUrl.value = scheme + "://" + document.location.hostname + port + "/dickensws";
+        connectionUrl.value = scheme + "://" + document.location.hostname + port + "/kkws";
 
         connectButton.onclick = function () {
             socket = new WebSocket(connectionUrl.value);
@@ -38,24 +40,51 @@
                 sentLog.innerHTML += '<div>Opened connection.</div>';
             };
             socket.onclose = function (event) {
-                sentLog.innerHTML += '<div>Closed connection.</div>';
+                sentLog.innerHTML += '<div>Closed connection. Test.</div>';
             };
             socket.onmessage = function (event) {
                 receivedLog.innerHTML += '<div>' + htmlEscape(event.data) + '</div>';
             };
         };
 
-        sendButton.onclick = function () {
+        jokeButton.onclick = function () {
 
             if (!socket || socket.readyState !== WebSocket.OPEN) {
                 alert("socket not connected");
                 return;
             }
-            var data = "More data from client.";
+            var data = "Tell a joke";
 
             sentLog.innerHTML += '<div>' + htmlEscape(data) + '</div>';
             socket.send(data);
-        };
+
+        }
+
+        whoButton.onclick = function () {
+
+            if (!socket || socket.readyState !== WebSocket.OPEN) {
+                alert("socket not connected");
+                return;
+            }
+            var data = "Who's there?";
+
+            sentLog.innerHTML += '<div>' + htmlEscape(data) + '</div>';
+            socket.send(data);
+
+        }
+
+        punchlineButton.onclick = function () {
+
+            if (!socket || socket.readyState !== WebSocket.OPEN) {
+                alert("socket not connected");
+                return;
+            }
+            var data = "... who?";
+
+            sentLog.innerHTML += '<div>' + htmlEscape(data) + '</div>';
+            socket.send(data);
+
+        }
 
         closeButton.onclick = function () {
             if (!socket || socket.readyState !== WebSocket.OPEN) {
