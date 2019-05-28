@@ -7,17 +7,17 @@
 <div>
     <div>
         <div>Controls</div>
-        <input id="connectionUrl" enabled="false"/>
+        <input id="connectionUrl" enabled="false" />
         <button id="connectButton" type="submit">Connect</button>
         <button id="closeButton" type="submit">Close</button>
         <button id="sendButton" type="submit">Send</button>
     </div>
-    <div>What we have received:</div>
-    <div id="receivedLog">
-    </div>
+
     <div>What we have sent:</div>
-    <div id="sentLog">
-    </div>
+    <div id="sentLog" style="border:2px solid red"></div>
+
+    <div>What we have received:</div>
+    <div id="receivedLog" class="reading-area"></div>
 
     <script>
         var receivedLog = document.getElementById("receivedLog");
@@ -29,19 +29,19 @@
 
         var scheme = document.location.protocol === "https:" ? "wss" : "ws";
         var port = document.location.port ? (":" + document.location.port) : "";
-        connectionUrl.value = scheme + "://" + document.location.hostname + port + "/dickensws" ;
+        connectionUrl.value = scheme + "://" + document.location.hostname + port + "/dickensws";
 
         connectButton.onclick = function () {
             socket = new WebSocket(connectionUrl.value);
 
             socket.onopen = function (event) {
-                sentLog.innerHTML += '<br /><p>Opened connection.</p>';
+                sentLog.innerHTML += '<div>Opened connection.</div>';
             };
             socket.onclose = function (event) {
-                sentLog.innerHTML += '<br /><p>Closed connection.</p>';
+                sentLog.innerHTML += '<div>Closed connection.</div>';
             };
             socket.onmessage = function (event) {
-                receivedLog.innerHTML += '<br /><p>'+ htmlEscape(event.data) +'</p>';
+                receivedLog.innerHTML += '<div>' + htmlEscape(event.data) + '</div>';
             };
         };
 
@@ -49,8 +49,11 @@
 
             if (!socket || socket.readyState !== WebSocket.OPEN) {
                 alert("socket not connected");
+                return;
             }
             var data = "More data from client.";
+
+            sentLog.innerHTML += '<div>' + htmlEscape(data) + '</div>';
             socket.send(data);
         };
 

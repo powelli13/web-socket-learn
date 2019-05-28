@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Net.WebSockets;
@@ -39,17 +40,10 @@ namespace WebSocketLearn.Controllers
 
             if (this.HttpContext.WebSockets.IsWebSocketRequest)
             {
+
                 WebSocket webSocket = await this.HttpContext.WebSockets.AcceptWebSocketAsync();
-                //await Echo(this.HttpContext, webSocket);
+                await StreamBook(this.HttpContext, webSocket);
 
-                string message = "Hi from the server!";
-
-                await webSocket.SendAsync(
-                    new ArraySegment<byte>(Encoding.ASCII.GetBytes(message)),
-                    WebSocketMessageType.Text,
-                    true,
-                    CancellationToken.None
-                );
             }
             else
             {
@@ -59,18 +53,68 @@ namespace WebSocketLearn.Controllers
             return Ok();
         }
 
-        //private async Task Echo(HttpContext context, WebSocket webSocket)
-        //{
-        //    var buffer = new byte[1024 * 4];
-        //    WebSocketReceiveResult result = await webSocket.ReceiveAsync(new ArraySegment<byte>(buffer), CancellationToken.None);
-        //    while (!result.CloseStatus.HasValue)
-        //    {
-        //        await webSocket.SendAsync(new ArraySegment<byte>(buffer, 0, result.Count), result.MessageType, result.EndOfMessage, CancellationToken.None);
+        // have the text to send defined somewhere
+        // open the text file with a stream and read amount of bytes based on the state
 
-        //        result = await webSocket.ReceiveAsync(new ArraySegment<byte>(buffer), CancellationToken.None);
-        //    }
-        //    await webSocket.CloseAsync(result.CloseStatus.Value, result.CloseStatusDescription, CancellationToken.None);
-        //}
+        // have state consisting of send speed and possibly text defined
+        // poll connection to ensure its open
+        // send apropriate amount of text data to client, according to state
+        // 
+
+        private async Task StreamBook(HttpContext context, WebSocket webSocket)
+        {
+            var readBuffer = new byte[1024 * 4];
+            int count = 0;
+
+            string bookFilePath = @"C:\Users\ipowell\Source\Repos\web-socket-learn\WebSocketLearn\WebSocketLearn\book_text\oliver_twist.txt";
+            int countRequested = 10;
+            int readCount = 0;
+            int index = 0;
+
+            char[] bookBuffer = await GetBookContents();
+            char[] sendBuffer = new char[10];
+
+            while (count++ < 100)
+            {
+                // Prepare bytes to send
+                for (int i = 0; i < 10; i++)
+                {
+                    sendBuffer[i] = bookBuffer[index];
+                    index++;
+                }
+
+                byte[] encodedText = Encoding.ASCII.GetBytes(sendBuffer);
+                ArraySegment<byte> bytesToSend = new ArraySegment<byte>(encodedText);
+
+                await webSocket.SendAsync(
+                    bytesToSend,
+                    WebSocketMessageType.Text,
+                    true,
+                    CancellationToken.None
+                );
+            }
+
+            await webSocket.SendAsync(
+                new ArraySegment<byte>(null),
+                WebSocketMessageType.Binary,
+                false,
+                CancellationToken.None
+            );
+        }
+
+        private async Task<char[]> GetBookContents()
+        {
+            string bookFilePath = @"C:\Users\ipowell\Source\Repos\web-socket-learn\WebSocketLearn\WebSocketLearn\book_text\oliver_twist.txt";
+            char[] buffer;
+
+            using (StreamReader sr = new StreamReader(bookFilePath))
+            {
+                buffer = new char[sr.BaseStream.Length];
+                await sr.ReadAsync(buffer, 0, (int)sr.BaseStream.Length);
+            }
+
+            return buffer;
+        }
 
         public IActionResult Privacy()
         {

@@ -23,6 +23,13 @@ body {
     width: 100%;
 }
 
+/* Literature streaming components */
+.reading-area {
+    margin: auto;
+    width: 500px;
+    border: 1px solid green;
+}
+
 /* QR code generator */
 #qrCode {
     margin: 15px;
