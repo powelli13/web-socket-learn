@@ -116,7 +116,7 @@ namespace WebSocketLearn.Controllers
                 clientResponse = Encoding.ASCII.GetString(readBuffer);
 
                 // client response is being padded. need to strip that out and then we are very close
-
+                // TODO test commit pick up here
                 if (clientResponse == "Who's there?")
                 {
                     bytesToSend = StringToBytes(joke.Who);
