@@ -27,7 +27,7 @@ namespace WebSocketLearn.Controllers
             return View();
         }
 
-        public IActionResult ReadDickens()
+        public IActionResult TellJokes()
         {
             ViewData["Message"] = "Enjoy some classic English literature.";
 
@@ -106,6 +106,9 @@ namespace WebSocketLearn.Controllers
                     CancellationToken.None
                 );
 
+                // TODO cleanse the buffer
+                
+
                 // await whose there
                 result = await webSocket.ReceiveAsync(
                     new ArraySegment<byte>(readBuffer),
@@ -113,7 +116,9 @@ namespace WebSocketLearn.Controllers
                 );
 
                 // send setup
-                clientResponse = Encoding.ASCII.GetString(readBuffer);
+                // TODO look for better method of stripping response data than just checking this one character
+                clientResponse = string.Empty;
+                clientResponse = Encoding.ASCII.GetString(readBuffer).Trim('\0');
 
                 // client response is being padded. need to strip that out and then we are very close
                 // TODO test commit pick up here
