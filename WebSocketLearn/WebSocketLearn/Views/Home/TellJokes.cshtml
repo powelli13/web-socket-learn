@@ -33,6 +33,9 @@
         var port = document.location.port ? (":" + document.location.port) : "";
         connectionUrl.value = scheme + "://" + document.location.hostname + port + "/kkws";
 
+        // TODO add meta data around the messages and parse them. That way the buttons can be responsive?
+        var currentWho = "...";
+
         connectButton.onclick = function () {
             socket = new WebSocket(connectionUrl.value);
 

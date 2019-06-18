@@ -82,6 +82,7 @@ namespace WebSocketLearn.Controllers
             // send greeting
             bytesToSend = StringToBytes("Hi there, prepare yourself for hilarious jokes!");
 
+            // send over greeting message, endOfMessage is true will force the client to read this right away
             await webSocket.SendAsync(
                 bytesToSend,
                 WebSocketMessageType.Text,
@@ -95,19 +96,25 @@ namespace WebSocketLearn.Controllers
             //    CancellationToken.None
             //);
             WebSocketReceiveResult result;
+            int bytesReceived = 1024;
 
             // while they don't close
             while (listening)
             {
 
                 // TODO cleanse the buffer find a better way to do this.
-                readBuffer = new byte[1024];
+                //readBuffer = new byte[1024];
+                for (int i = 0; i < bytesReceived; i++)
+                {
+                    byte.TryParse("\0", out readBuffer[i]);
+                }
 
                 // await whose there
                 result = await webSocket.ReceiveAsync(
                     new ArraySegment<byte>(readBuffer),
                     CancellationToken.None
                 );
+                bytesReceived = result.Count < 1024 ? result.Count : 1024;
 
                 if (result.CloseStatus.HasValue)
                 {
