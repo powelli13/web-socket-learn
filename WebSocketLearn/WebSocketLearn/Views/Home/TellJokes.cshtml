@@ -40,7 +40,7 @@
                 sentLog.innerHTML += '<div>Opened connection.</div>';
             };
             socket.onclose = function (event) {
-                sentLog.innerHTML += '<div>Closed connection. Test.</div>';
+                sentLog.innerHTML += '<div>Closed connection.</div>';
             };
             socket.onmessage = function (event) {
                 receivedLog.innerHTML += '<div>' + htmlEscape(event.data) + '</div>';

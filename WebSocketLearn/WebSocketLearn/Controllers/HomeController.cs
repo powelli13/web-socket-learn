@@ -29,7 +29,7 @@ namespace WebSocketLearn.Controllers
 
         public IActionResult TellJokes()
         {
-            ViewData["Message"] = "Enjoy some classic English literature.";
+            ViewData["Message"] = "Enjoy some knock, knock jokes.";
 
             return View();
         }
@@ -70,44 +70,38 @@ namespace WebSocketLearn.Controllers
         private async Task TellJokes(HttpContext context, WebSocket webSocket)
         {
 
-            //var buffer = new byte[1024 * 4];
-            //WebSocketReceiveResult result = await webSocket.ReceiveAsync(new ArraySegment<byte>(buffer), CancellationToken.None);
-            //while (!result.CloseStatus.HasValue)
-            //{
-            //    await webSocket.SendAsync(new ArraySegment<byte>(buffer, 0, result.Count), result.MessageType, result.EndOfMessage, CancellationToken.None);
-
-            //    result = await webSocket.ReceiveAsync(new ArraySegment<byte>(buffer), CancellationToken.None);
-            //}
-            //await webSocket.CloseAsync(result.CloseStatus.Value, result.CloseStatusDescription, CancellationToken.None);
-
             JokeModel joke = new JokeModel("Cow says.", "No, a cow says MOOO!!");
-            byte[] readBuffer = new byte[1024 * 4];
+            byte[] readBuffer = new byte[1024];
             ArraySegment<byte> bytesToSend = new ArraySegment<byte>();
             string clientResponse;
+            bool listening = true;
 
+            // send knock knock
+            string kk = "Knock, knock.";
 
-            WebSocketReceiveResult result = await webSocket.ReceiveAsync(
-                new ArraySegment<byte>(readBuffer),
+            // send greeting
+            bytesToSend = StringToBytes("Hi there, prepare yourself for hilarious jokes!");
+
+            await webSocket.SendAsync(
+                bytesToSend,
+                WebSocketMessageType.Text,
+                true,
                 CancellationToken.None
             );
 
+            // wait for first command
+            //WebSocketReceiveResult result = await webSocket.ReceiveAsync(
+            //    new ArraySegment<byte>(readBuffer),
+            //    CancellationToken.None
+            //);
+            WebSocketReceiveResult result;
+
             // while they don't close
-            while (!result.CloseStatus.HasValue)
+            while (listening)
             {
-                // send knock knock
-                string kk = "Knock, knock.";
 
-                bytesToSend = StringToBytes(kk);
-
-                await webSocket.SendAsync(
-                    bytesToSend,
-                    result.MessageType,
-                    result.EndOfMessage,
-                    CancellationToken.None
-                );
-
-                // TODO cleanse the buffer
-                
+                // TODO cleanse the buffer find a better way to do this.
+                readBuffer = new byte[1024];
 
                 // await whose there
                 result = await webSocket.ReceiveAsync(
@@ -115,14 +109,30 @@ namespace WebSocketLearn.Controllers
                     CancellationToken.None
                 );
 
+                if (result.CloseStatus.HasValue)
+                {
+                    listening = false;
+                    break;
+                }
+
                 // send setup
                 // TODO look for better method of stripping response data than just checking this one character
                 clientResponse = string.Empty;
                 clientResponse = Encoding.ASCII.GetString(readBuffer).Trim('\0');
 
-                // client response is being padded. need to strip that out and then we are very close
-                // TODO test commit pick up here
-                if (clientResponse == "Who's there?")
+                if (clientResponse == "Tell a joke")
+                {
+                    bytesToSend = StringToBytes(kk);
+
+                    await webSocket.SendAsync(
+                        bytesToSend,
+                        result.MessageType,
+                        result.EndOfMessage,
+                        CancellationToken.None
+                    );
+                }
+                // setup joke
+                else if (clientResponse == "Who's there?")
                 {
                     bytesToSend = StringToBytes(joke.Who);
 
@@ -147,7 +157,8 @@ namespace WebSocketLearn.Controllers
                 }
                 else
                 {
-                    break;
+                    // TODO this just means unrecognized command should we really break?5
+                    listening = false;
                 }
             }
         }
