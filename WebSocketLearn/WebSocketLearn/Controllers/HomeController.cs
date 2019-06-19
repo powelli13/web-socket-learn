@@ -75,6 +75,7 @@ namespace WebSocketLearn.Controllers
             ArraySegment<byte> bytesToSend = new ArraySegment<byte>();
             string clientResponse;
             bool listening = true;
+            JokeState jokeState = JokeState.None;
 
             // send knock knock
             string kk = "Knock, knock.";
@@ -90,11 +91,6 @@ namespace WebSocketLearn.Controllers
                 CancellationToken.None
             );
 
-            // wait for first command
-            //WebSocketReceiveResult result = await webSocket.ReceiveAsync(
-            //    new ArraySegment<byte>(readBuffer),
-            //    CancellationToken.None
-            //);
             WebSocketReceiveResult result;
             int bytesReceived = 1024;
 
@@ -127,49 +123,68 @@ namespace WebSocketLearn.Controllers
                 clientResponse = string.Empty;
                 clientResponse = Encoding.ASCII.GetString(readBuffer).Trim('\0');
 
-                if (clientResponse == "Tell a joke")
-                {
-                    bytesToSend = StringToBytes(kk);
+                jokeState = GetJokeState(clientResponse);
 
-                    await webSocket.SendAsync(
-                        bytesToSend,
-                        result.MessageType,
-                        result.EndOfMessage,
-                        CancellationToken.None
-                    );
-                }
-                // setup joke
-                else if (clientResponse == "Who's there?")
+                switch (jokeState)
                 {
-                    bytesToSend = StringToBytes(joke.Who);
+                    case JokeState.KnockKnock:
+                        bytesToSend = StringToBytes(kk);
 
-                    await webSocket.SendAsync(
-                        bytesToSend,
-                        result.MessageType,
-                        result.EndOfMessage,
-                        CancellationToken.None
-                    );
-                }
-                //send punch line
-                else if (clientResponse == "... who?")
-                {
-                    bytesToSend = StringToBytes(joke.Punchline);
+                        await webSocket.SendAsync(
+                            bytesToSend,
+                            result.MessageType,
+                            result.EndOfMessage,
+                            CancellationToken.None
+                        );
+                        break;
+                 
+                    case JokeState.Who:
+                        bytesToSend = StringToBytes(joke.Who);
 
-                    await webSocket.SendAsync(
-                        bytesToSend,
-                        result.MessageType,
-                        result.EndOfMessage,
-                        CancellationToken.None
-                    );
-                }
-                else
-                {
-                    // TODO this just means unrecognized command should we really break?5
-                    listening = false;
+                        await webSocket.SendAsync(
+                            bytesToSend,
+                            result.MessageType,
+                            result.EndOfMessage,
+                            CancellationToken.None
+                        );
+                        break;
+                 
+                    case JokeState.Punchline:
+                        bytesToSend = StringToBytes(joke.Punchline);
+
+                        await webSocket.SendAsync(
+                            bytesToSend,
+                            result.MessageType,
+                            result.EndOfMessage,
+                            CancellationToken.None
+                        );
+                        break;
+                    default:
+                        // TODO give a message when they are out of the joke state?
+                        // TODO this just means unrecognized command should we really break?5
+                        //listening = false;
+                        break;
                 }
             }
         }
 
+        public JokeState GetJokeState(string s)
+        {
+            if (s.Contains("joke", StringComparison.CurrentCultureIgnoreCase))
+            {
+                return JokeState.KnockKnock;
+            }
+            else if (s.Contains("there", StringComparison.CurrentCultureIgnoreCase))
+            {
+                return JokeState.Who;
+            }
+            else if (s.Contains("who?", StringComparison.CurrentCultureIgnoreCase))
+            {
+                return JokeState.Punchline;
+            }
+
+            return JokeState.None;
+        }
         public ArraySegment<byte> StringToBytes(string s)
         {
             byte[] encodedText = Encoding.ASCII.GetBytes(s);

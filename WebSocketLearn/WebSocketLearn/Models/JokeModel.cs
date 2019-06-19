@@ -5,6 +5,14 @@ using System.Threading.Tasks;
 
 namespace WebSocketLearn.Models
 {
+    public enum JokeState
+    {
+        None,
+        KnockKnock,
+        Who,
+        Punchline
+    }
+
     public class JokeModel
     {
         public string Who { get; set; }
