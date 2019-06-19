@@ -3,15 +3,19 @@
 }
 <h2>@ViewData["Title"]</h2>
 <h3>@ViewData["Message"]</h3>
-
+<style>
+    sans-text {
+        font: 12px arial, verdana, sans-serif;
+    }
+</style>
 <div>
     <div>
         <div>Controls</div>
         <input id="connectionUrl" enabled="false" />
         <button id="connectButton" type="submit">Connect</button>
         <button id="closeButton" type="submit">Close</button>
-        <div id="chatLog"></div>
-        <input id="chatMessage" />
+        <div id="chatLog" class="sans-text"></div>
+        <input id="chatMessage" class="sans-text" />
         <button id="sendChatButton" type="submit">Send</button>
     </div>
 
@@ -30,8 +34,6 @@
         var sendChatButton = document.getElementById("sendChatButton");
 
         var chatMessage = document.getElementById("chatMessage");
-        //var closeButton = document.getElementById("closeButton");
-        //var connectionUrl = document.getElementById("connectionUrl");
         var socket;
 
         var scheme = document.location.protocol === "https:" ? "wss" : "ws";
@@ -50,9 +52,6 @@
             socket.onclose = function (event) {
                 sentLog.innerHTML += '<div>Closed connection.</div>';
             };
-            //socket.onmessage = function (event) {
-            //    receivedLog.innerHTML += '<div>' + htmlEscape(event.data) + '</div>';
-            //};
             socket.onmessage = function (event) {
                 chatLog.innerHTML += '<br /><span>' + htmlEscape(event.data) + '</span>';
             }
