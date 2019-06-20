@@ -24,7 +24,7 @@
         var receivedLog = document.getElementById("receivedLog");
         var serverStatus = document.getElementById("serverStatus");
         var chatLog = document.getElementById("chatLog");
-
+        
         var connectButton = document.getElementById("connectButton");
         var sendChatButton = document.getElementById("sendChatButton");
 
@@ -39,13 +39,13 @@
             socket = new WebSocket(connectionUrl.value);
 
             socket.onopen = function (event) {
-                sentLog.innerHTML += '<div>Opened connection.</div>';
+                serverStatus.innerHTML = 'Connected';
             };
             socket.onclose = function (event) {
-                sentLog.innerHTML += '<div>Closed connection.</div>';
+                serverStatus.innerHTML = 'Disconnected';
             };
             socket.onmessage = function (event) {
-                chatLog.innerHTML += '<br /><span class="server-chat-entry">' + htmlEscape(event.data) + '</span>';
+                chatLog.innerHTML += '<div class="server-chat-entry chat-entry">' + htmlEscape(event.data) + '</div>';
             }
         };
 
@@ -60,7 +60,7 @@
             var data = chatMessage.value;
             chatMessage.value = "";
 
-            chatLog.innerHTML += '<br /><span class="client-chat-entry">' + htmlEscape(data) + '</span>';
+            chatLog.innerHTML += '<div class="client-chat-entry chat-entry">' + htmlEscape(data) + '</div>';
             socket.send(data);
             
         }

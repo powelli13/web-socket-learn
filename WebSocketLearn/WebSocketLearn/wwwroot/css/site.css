@@ -39,6 +39,11 @@ body {
     text-align: right;
 }
 
+.chat-entry {
+    margin: 8px 4px;
+    max-width: 300px;
+}
+
 /* QR code generator */
 #qrCode {
     margin: 15px;
