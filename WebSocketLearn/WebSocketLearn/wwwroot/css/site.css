@@ -3,6 +3,7 @@ for details on configuring this project to bundle and minify static web assets. 
 body {
     padding-top: 50px;
     padding-bottom: 20px;
+    font: 12px arial, verdana, sans-serif;
 }
 
 /* Wrapping element */
@@ -23,13 +24,24 @@ body {
     width: 100%;
 }
 
+#chatLog {
+    width: 100%;
+    margin: auto;
+}
+
+.client-chat-entry {
+    border: 1px solid green;
+    text-align: left;
+}
+
+.server-chat-entry {
+    border: 1px solid blue;
+    text-align: right;
+}
+
 /* QR code generator */
 #qrCode {
     margin: 15px;
-}
-
-* {
-    font: 12px arial, verdana, sans-serif;
 }
 
 /* Hide/rearrange for smaller screens */

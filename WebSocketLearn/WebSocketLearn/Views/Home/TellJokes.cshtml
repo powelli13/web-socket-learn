@@ -3,31 +3,26 @@
 }
 <h2>@ViewData["Title"]</h2>
 <h3>@ViewData["Message"]</h3>
-<style>
-    sans-text {
-        font: 12px arial, verdana, sans-serif;
-    }
-</style>
+
 <div>
     <div>
         <div>Controls</div>
-        <input id="connectionUrl" enabled="false" />
-        <button id="connectButton" type="submit">Connect</button>
-        <button id="closeButton" type="submit">Close</button>
-        <div id="chatLog" class="sans-text"></div>
-        <input id="chatMessage" class="sans-text" />
+        <div>
+            Server Status: <span id="serverStatus">Disconnected</span>
+        </div>
+        <div>
+            <input id="connectionUrl" enabled="false" />
+            <button id="connectButton" type="submit">Connect</button>
+            <button id="closeButton" type="submit">Close</button>
+        </div>
+        <div id="chatLog"></div>
+        <input id="chatMessage" />
         <button id="sendChatButton" type="submit">Send</button>
     </div>
-
-    <div>What we have sent:</div>
-    <div id="sentLog" style="border:2px solid red"></div>
-
-    <div>What we have received:</div>
-    <div id="receivedLog" class="reading-area"></div>
-
+    <!-- TODO add a server status monitor and display it -->
     <script>
         var receivedLog = document.getElementById("receivedLog");
-        var sentLog = document.getElementById("sentLog");
+        var serverStatus = document.getElementById("serverStatus");
         var chatLog = document.getElementById("chatLog");
 
         var connectButton = document.getElementById("connectButton");
@@ -40,9 +35,6 @@
         var port = document.location.port ? (":" + document.location.port) : "";
         connectionUrl.value = scheme + "://" + document.location.hostname + port + "/kkws";
 
-        // TODO add meta data around the messages and parse them. That way the buttons can be responsive?
-        var currentWho = "...";
-
         connectButton.onclick = function () {
             socket = new WebSocket(connectionUrl.value);
 
@@ -53,7 +45,7 @@
                 sentLog.innerHTML += '<div>Closed connection.</div>';
             };
             socket.onmessage = function (event) {
-                chatLog.innerHTML += '<br /><span>' + htmlEscape(event.data) + '</span>';
+                chatLog.innerHTML += '<br /><span class="server-chat-entry">' + htmlEscape(event.data) + '</span>';
             }
         };
 
@@ -68,7 +60,7 @@
             var data = chatMessage.value;
             chatMessage.value = "";
 
-            chatLog.innerHTML += '<br /><span>' + htmlEscape(data) + '</span>';
+            chatLog.innerHTML += '<br /><span class="client-chat-entry">' + htmlEscape(data) + '</span>';
             socket.send(data);
             
         }

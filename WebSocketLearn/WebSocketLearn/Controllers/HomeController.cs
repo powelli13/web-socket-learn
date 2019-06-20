@@ -132,8 +132,8 @@ namespace WebSocketLearn.Controllers
 
                         await webSocket.SendAsync(
                             bytesToSend,
-                            result.MessageType,
-                            result.EndOfMessage,
+                            WebSocketMessageType.Text,
+                            true,
                             CancellationToken.None
                         );
                         break;
@@ -143,8 +143,8 @@ namespace WebSocketLearn.Controllers
 
                         await webSocket.SendAsync(
                             bytesToSend,
-                            result.MessageType,
-                            result.EndOfMessage,
+                            WebSocketMessageType.Text,  
+                            true,
                             CancellationToken.None
                         );
                         break;
@@ -154,15 +154,20 @@ namespace WebSocketLearn.Controllers
 
                         await webSocket.SendAsync(
                             bytesToSend,
-                            result.MessageType,
-                            result.EndOfMessage,
+                            WebSocketMessageType.Text,
+                            true,
                             CancellationToken.None
                         );
                         break;
                     default:
-                        // TODO give a message when they are out of the joke state?
-                        // TODO this just means unrecognized command should we really break?5
-                        //listening = false;
+                        bytesToSend = StringToBytes("That doesn't make sense.");
+
+                        await webSocket.SendAsync(
+                            bytesToSend,
+                            WebSocketMessageType.Text,
+                            true,
+                            CancellationToken.None
+                        );
                         break;
                 }
             }
