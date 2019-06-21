@@ -15,9 +15,15 @@
             <button id="connectButton" type="submit">Connect</button>
             <button id="closeButton" type="submit">Close</button>
         </div>
-        <div id="chatLog"></div>
-        <input id="chatMessage" />
-        <button id="sendChatButton" type="submit">Send</button>
+        <div class="chat-wrapper">
+            <div class="chat-log-wrapper">
+                <div id="chatLog"></div>
+            </div>
+            <div class="chat-input-wrapper">
+                <input id="chatMessage" />
+                <button id="sendChatButton" type="submit">Send</button>
+            </div>
+        </div>
     </div>
     <!-- TODO add a server status monitor and display it -->
     <script>

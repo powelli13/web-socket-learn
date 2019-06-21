@@ -24,24 +24,35 @@ body {
     width: 100%;
 }
 
-#chatLog {
-    width: 100%;
+.chat-log-wrapper,
+.chat-input-wrapper {
+    max-width: 300px;
     margin: auto;
 }
 
 .client-chat-entry {
-    border: 1px solid green;
+    border-bottom: 1px solid #20af40;
+    border-left: 1px solid #20af40;
+    box-shadow: -2px 2px 4px #20af40;
     text-align: left;
 }
 
 .server-chat-entry {
-    border: 1px solid blue;
+    border-bottom: 1px solid #2040af;
+    border-right: 1px solid #2040af;
+    box-shadow: 2px 2px 4px #2040af;
     text-align: right;
 }
 
 .chat-entry {
+    padding: 8px 8px;
     margin: 8px 4px;
     max-width: 300px;
+}
+
+.chat-wrapper {
+    width: 100%;
+    margin: auto;
 }
 
 /* QR code generator */
