@@ -30,6 +30,13 @@ body {
     margin: auto;
 }
 
+.chat-log-wrapper {
+    display: flex;
+    align-items: flex-end;
+    overflow: scroll;
+    height: 300px;
+}
+
 .client-chat-entry {
     border-bottom: 1px solid #20af40;
     border-left: 1px solid #20af40;

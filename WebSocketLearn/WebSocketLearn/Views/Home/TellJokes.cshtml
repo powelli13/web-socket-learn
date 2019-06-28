@@ -16,7 +16,7 @@
             <button id="closeButton" type="submit">Close</button>
         </div>
         <div class="chat-wrapper">
-            <div class="chat-log-wrapper">
+            <div class="chat-log-wrapper" id="chatLogWrapper">
                 <div id="chatLog"></div>
             </div>
             <div class="chat-input-wrapper">
@@ -29,6 +29,7 @@
     <script>
         var receivedLog = document.getElementById("receivedLog");
         var serverStatus = document.getElementById("serverStatus");
+        var chatLogWrapper = document.getElementById("chatLogWrapper");
         var chatLog = document.getElementById("chatLog");
         
         var connectButton = document.getElementById("connectButton");
@@ -52,6 +53,7 @@
             };
             socket.onmessage = function (event) {
                 chatLog.innerHTML += '<div class="server-chat-entry chat-entry">' + htmlEscape(event.data) + '</div>';
+                chatLogWrapper.scrollTop = chatLogWrapper.scrollHeight;
             }
         };
 
