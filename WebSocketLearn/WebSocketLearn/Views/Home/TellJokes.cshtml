@@ -13,7 +13,7 @@
         <div>
             <input id="connectionUrl" enabled="false" />
             <button id="connectButton" type="submit">Connect</button>
-            <button id="closeButton" type="submit">Close</button>
+            <button id="closeButton" type="submit" enabled="false">Close</button>
         </div>
         <div class="chat-wrapper">
             <div class="chat-log-wrapper" id="chatLogWrapper">
@@ -25,7 +25,6 @@
             </div>
         </div>
     </div>
-    <!-- TODO add a server status monitor and display it -->
     <script>
         var receivedLog = document.getElementById("receivedLog");
         var serverStatus = document.getElementById("serverStatus");
@@ -42,7 +41,7 @@
         var port = document.location.port ? (":" + document.location.port) : "";
         connectionUrl.value = scheme + "://" + document.location.hostname + port + "/kkws";
 
-        connectButton.onclick = function () {
+        connectButton.addEventListener("click", function () {
             socket = new WebSocket(connectionUrl.value);
 
             socket.onopen = function (event) {
@@ -54,31 +53,44 @@
             socket.onmessage = function (event) {
                 chatLog.innerHTML += '<div class="server-chat-entry chat-entry">' + htmlEscape(event.data) + '</div>';
                 chatLogWrapper.scrollTop = chatLogWrapper.scrollHeight;
+            };
+        });
+
+        chatMessage.addEventListener("keyup", function (e) {
+            if (e.keyCode == 13) {
+                if (!socket || socket.readyState !== WebSocket.OPEN) {
+                    alert("socket not connected");
+                    return;
+                }
+
+                var data = chatMessage.value;
+                chatMessage.value = "";
+
+                chatLog.innerHTML += '<div class="client-chat-entry chat-entry">' + htmlEscape(data) + '</div>';
+                socket.send(data);
             }
-        };
+        });
 
-        sendChatButton.onclick = function () {
-
+        sendChatButton.addEventListener("click", function () {
             if (!socket || socket.readyState !== WebSocket.OPEN) {
                 alert("socket not connected");
                 return;
             }
-            // TODO capture enter when the cursor is in the chatMessage input or use a better element
 
             var data = chatMessage.value;
             chatMessage.value = "";
 
             chatLog.innerHTML += '<div class="client-chat-entry chat-entry">' + htmlEscape(data) + '</div>';
             socket.send(data);
-            
-        }
+        });
 
-        closeButton.onclick = function () {
+        closeButton.addEventListener("click", function () {
             if (!socket || socket.readyState !== WebSocket.OPEN) {
                 alert("webSocket not connected");
             }
+
             socket.close(1000, "Closing from client");
-        };
+        });
 
         function htmlEscape(str) {
             return str.toString()

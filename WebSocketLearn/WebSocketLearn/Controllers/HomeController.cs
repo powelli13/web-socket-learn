@@ -56,24 +56,16 @@ namespace WebSocketLearn.Controllers
         // have the text to send defined somewhere
         // open the text file with a stream and read amount of bytes based on the state
 
-        // have objects of knock knock jokes stored
-            // initial
-            // who punchline
-        // read jokes from file, JSON?
-        // when connection opens send Knock, knock
-        // wait for client response, if 'whose there?' send initial
-        // wait for response, if '... who?' send punchline
-        // poll connection to ensure its open
-        // 
-        // 
-
         private async Task TellJokes(HttpContext context, WebSocket webSocket)
         {
+            JokeModel[] jokes = LoadJokes();
+            Random rand = new Random();
+            int jokeIndex = rand.Next(jokes.Length);
 
-            JokeModel joke = new JokeModel("Cow says.", "No, a cow says MOOO!!");
-            byte[] readBuffer = new byte[1024];
             ArraySegment<byte> bytesToSend = new ArraySegment<byte>();
+            byte[] readBuffer = new byte[1024];
             string clientResponse;
+
             bool listening = true;
             JokeState jokeState = JokeState.None;
 
@@ -98,8 +90,7 @@ namespace WebSocketLearn.Controllers
             while (listening)
             {
 
-                // TODO cleanse the buffer find a better way to do this.
-                //readBuffer = new byte[1024];
+                // cleanse the buffer
                 for (int i = 0; i < bytesReceived; i++)
                 {
                     byte.TryParse("\0", out readBuffer[i]);
@@ -119,8 +110,6 @@ namespace WebSocketLearn.Controllers
                 }
 
                 // send setup
-                // TODO look for better method of stripping response data than just checking this one character
-                clientResponse = string.Empty;
                 clientResponse = Encoding.ASCII.GetString(readBuffer).Trim('\0');
 
                 jokeState = GetJokeState(clientResponse);
@@ -139,7 +128,7 @@ namespace WebSocketLearn.Controllers
                         break;
                  
                     case JokeState.Who:
-                        bytesToSend = StringToBytes(joke.Who);
+                        bytesToSend = StringToBytes(jokes[jokeIndex].Who);
 
                         await webSocket.SendAsync(
                             bytesToSend,
@@ -150,7 +139,9 @@ namespace WebSocketLearn.Controllers
                         break;
                  
                     case JokeState.Punchline:
-                        bytesToSend = StringToBytes(joke.Punchline);
+                        bytesToSend = StringToBytes(jokes[jokeIndex].Punchline);
+
+                        jokeIndex = rand.Next(jokes.Length);
 
                         await webSocket.SendAsync(
                             bytesToSend,
@@ -190,10 +181,26 @@ namespace WebSocketLearn.Controllers
 
             return JokeState.None;
         }
+
         public ArraySegment<byte> StringToBytes(string s)
         {
             byte[] encodedText = Encoding.ASCII.GetBytes(s);
             return new ArraySegment<byte>(encodedText);
+        }
+
+        public JokeModel[] LoadJokes()
+        {
+            return new JokeModel[]
+            {
+                new JokeModel("Cow says.", "No a Cow says MOOO!!"),
+                new JokeModel("Kanga.", "Actually, it's kangaroo."),
+                new JokeModel("Beats.", "Beats me."),
+                new JokeModel("A broken pencil.", "Nevermind, it's pointless."),
+                new JokeModel("Little old lady.", "I didn't know you could yodel."),
+                new JokeModel("Etch.", "Bless you."),
+                new JokeModel("Spell", "W - H - O."),
+                new JokeModel("Orange", "Orange you going to answer the door?")
+            };
         }
 
         public IActionResult Privacy()
