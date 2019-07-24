@@ -1,0 +1,39 @@
+Presentation slides:
+
+1. Origin
+    - Oiriginally defined in RFC 6455 in 2011 
+
+2. Purpose
+    - Created to solve bidirectional communication issues with server
+    - Issues before:
+        - Server is forced to use one TCP connection for sending to client and a new one for each incoming client request
+        - High unnecessary overhead of HTTP header on each message
+        - Client forced to map outgoing connections to the incoming connection when tracking replies
+
+2. Design Philosophy
+    - Designed on the principle that there should be minimal framing 
+        - the only framing that exists is to make the
+            protocol frame-based instead of stream-based and to support a
+            distinction between Unicode text and binary frames  
+   - Any desired metadata would be layered on top of WebSocket by the application
+
+3. Relationship to Network Stack
+    - The WebSocket Protocol is an independent TCP-based protocol.  Its
+   only relationship to HTTP is that its handshake is interpreted by
+   HTTP servers as an Upgrade request.
+   - Also sits at the Application Layer of the network stack
+
+4. Using WebSockets
+    - In .NET using WebSockets is a breeze
+    - Start in Javascript as a WebSocket
+    - URI is either "ws" for port 80 and "wss" is port 443
+    - Clientside can bind events
+    - serverside can send and receive async, reading bytes into a buffer
+
+5. Adaption and Uses
+    - get online
+
+6. Future of WebSockets
+    - get online
+
+
