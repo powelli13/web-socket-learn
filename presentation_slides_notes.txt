@@ -30,10 +30,4 @@ Presentation slides:
     - Clientside can bind events
     - serverside can send and receive async, reading bytes into a buffer
 
-5. Adaption and Uses
-    - get online
-
-6. Future of WebSockets
-    - get online
-
 
