@@ -1,14 +1,11 @@
-﻿using System;
-using System.IO;
-using System.Collections.Generic;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using System;
 using System.Diagnostics;
 using System.Net.WebSockets;
-using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Http;
 using WebSocketLearn.Models;
 
 namespace WebSocketLearn.Controllers
@@ -53,9 +50,6 @@ namespace WebSocketLearn.Controllers
             return Ok();
         }
 
-        // have the text to send defined somewhere
-        // open the text file with a stream and read amount of bytes based on the state
-
         private async Task TellJokes(HttpContext context, WebSocket webSocket)
         {
             JokeModel[] jokes = LoadJokes();
@@ -66,7 +60,6 @@ namespace WebSocketLearn.Controllers
             byte[] readBuffer = new byte[1024];
             string clientResponse;
 
-            bool listening = true;
             JokeState jokeState = JokeState.None;
 
             // send knock knock
@@ -87,7 +80,7 @@ namespace WebSocketLearn.Controllers
             int bytesReceived = 1024;
 
             // while they don't close
-            while (listening)
+            while (true)
             {
 
                 // cleanse the buffer
@@ -105,7 +98,6 @@ namespace WebSocketLearn.Controllers
 
                 if (result.CloseStatus.HasValue)
                 {
-                    listening = false;
                     break;
                 }
 
